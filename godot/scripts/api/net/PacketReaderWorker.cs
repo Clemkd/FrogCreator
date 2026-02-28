@@ -45,9 +45,14 @@ public class PacketReaderWorker
 
     private void RaiseReceivedPacketEvent(Packet packet)
     {
-        for (int i = 0; i < _listeners.Count; i++)
+        IPacketListener[] snapshot;
+        lock (_listeners)
         {
-            _listeners[i].OnPacketReceived(packet);
+            snapshot = _listeners.ToArray();
+        }
+        for (int i = 0; i < snapshot.Length; i++)
+        {
+            snapshot[i].OnPacketReceived(packet);
         }
     }
 

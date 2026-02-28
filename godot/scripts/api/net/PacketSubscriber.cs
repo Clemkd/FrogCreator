@@ -46,17 +46,16 @@ public class PacketSubscriber
 
     public void PushPacket(Packet packet)
     {
+        IPacketListener[] snapshot;
         lock (_lock)
         {
-            if (_listeners.ContainsKey(packet.GetPacketType()))
-            {
-                var list = _listeners[packet.GetPacketType()];
-                int size = list.Count;
-                for (int i = 0; i < size; i++)
-                {
-                    list[i].OnPacketReceived(packet);
-                }
-            }
+            if (!_listeners.ContainsKey(packet.GetPacketType()))
+                return;
+            snapshot = _listeners[packet.GetPacketType()].ToArray();
+        }
+        for (int i = 0; i < snapshot.Length; i++)
+        {
+            snapshot[i].OnPacketReceived(packet);
         }
     }
 }
