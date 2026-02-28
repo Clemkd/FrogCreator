@@ -1,12 +1,12 @@
 # 🐸 FrogCreator
 
-[![Build Status](https://travis-ci.org/ClementDidier/FrogCreator.svg?branch=master)](https://travis-ci.org/ClementDidier/FrogCreator)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Java](https://img.shields.io/badge/Java-8-orange.svg)](https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html)
+[![C#](https://img.shields.io/badge/C%23-.NET%208-purple.svg)](https://dotnet.microsoft.com/)
+[![Godot](https://img.shields.io/badge/Godot-4.2-blue.svg)](https://godotengine.org/)
 
-**FrogCreator** est un moteur de création de MMORPG 2D open source, réécriture moderne en Java du célèbre projet [FRoG Creator](https://fr.wikipedia.org/wiki/FRoG_Creator) (French Online Game Creator), originellement développé en Visual Basic 6.
+**FrogCreator** est un moteur de création de MMORPG 2D open source, réécriture moderne en C# avec le moteur Godot du célèbre projet [FRoG Creator](https://fr.wikipedia.org/wiki/FRoG_Creator) (French Online Game Creator), originellement développé en Visual Basic 6.
 
-Ce dépôt représente la **version 1 (v1)** du projet, avec pour objectif de proposer une base solide, multiplateforme et extensible pour la création de jeux de rôle en ligne massivement multijoueurs en 2D.
+Ce dépôt représente la **version 2 (v2)** du projet, migrée de Java/LibGDX vers **C#/Godot 4**, avec pour objectif de proposer une base solide, multiplateforme et extensible pour la création de jeux de rôle en ligne massivement multijoueurs en 2D.
 
 ---
 
@@ -31,9 +31,10 @@ FRoG Creator est un projet communautaire français né au début des années 200
 
 Le projet original a fédéré une large communauté francophone de créateurs de jeux, avant que le développement officiel ne s'arrête vers 2015.
 
-**FrogCreator v1** est une réécriture complète en Java, visant à :
-- Moderniser la base de code avec des technologies actuelles (Java 8, LibGDX, Maven)
-- Offrir une compatibilité multiplateforme (Windows, macOS, Linux)
+**FrogCreator v2** est une migration complète vers C# et le moteur Godot 4, visant à :
+- Profiter de l'écosystème Godot (éditeur intégré, rendu, physique, audio, export multiplateforme)
+- Utiliser C# et .NET 8 pour un code moderne, performant et typé
+- Offrir une compatibilité multiplateforme (Windows, macOS, Linux, et potentiellement mobile)
 - Proposer une architecture modulaire et extensible via un système de plugins
 - Conserver l'esprit d'accessibilité et de simplicité de l'original
 
@@ -49,43 +50,49 @@ Le projet original a fédéré une large communauté francophone de créateurs d
 - **Système d'événements** découplé pour la communication entre modules
 - **Système de plugins** pour étendre les fonctionnalités du moteur
 - **Internationalisation (i18n)** avec support du français et de l'anglais
-- **Éditeur de jeu** basé sur JavaFX pour la création de contenu
-- **Client de jeu** avec rendu graphique LibGDX (effets, transitions d'écrans, etc.)
+- **Client de jeu** intégré au moteur Godot 4 (effets, transitions d'écrans, caméra 2D)
+- **Éditeur de jeu** tirant parti de l'éditeur intégré Godot
 
 ---
 
 ## 🏗 Architecture
 
-Le projet est structuré en **4 modules Maven** :
+Le projet est structuré dans un **projet Godot C#** avec les modules suivants :
 
 ```
-FrogCreator/
-├── api/        # Bibliothèque partagée (entités, réseau, systèmes, utilitaires)
-├── client/     # Client de jeu (LibGDX, rendu graphique, écrans)
-├── editor/     # Éditeur de contenu (JavaFX)
-├── server/     # Serveur de jeu (gestion des connexions, plugins, concurrence)
-└── pom.xml     # POM parent Maven
+godot/
+├── scripts/
+│   ├── api/        # Bibliothèque partagée (entités, réseau, systèmes, utilitaires)
+│   ├── client/     # Client de jeu (Godot, rendu graphique, écrans)
+│   ├── server/     # Serveur de jeu (gestion des connexions, plugins, concurrence)
+│   └── editor/     # Éditeur de contenu
+├── assets/         # Ressources graphiques
+├── localization/   # Fichiers de localisation
+├── tests/          # Tests unitaires (NUnit)
+├── FrogCreator.csproj   # Projet C# principal (Godot SDK)
+├── FrogCreator.sln      # Solution .NET
+└── project.godot        # Configuration du projet Godot
 ```
 
 ### Diagramme simplifié
 
 ```
-┌──────────┐       ┌──────────┐
-│  Client  │◄─────►│  Server  │
-│ (LibGDX) │  TCP  │  (Java)  │
-└────┬─────┘       └────┬─────┘
-     │                   │
-     └───────┬───────────┘
-             │
-        ┌────▼────┐
-        │   API   │
-        │ (Core)  │
-        └─────────┘
+┌──────────────┐       ┌──────────────┐
+│    Client    │◄─────►│    Server    │
+│  (Godot C#)  │  TCP  │    (C#)     │
+└──────┬───────┘       └──────┬───────┘
+       │                       │
+       └─────────┬─────────────┘
+                 │
+            ┌────▼────┐
+            │   API   │
+            │ (Core)  │
+            └─────────┘
 
-┌──────────┐
-│  Editor  │
-│ (JavaFX) │
-└──────────┘
+┌──────────────┐
+│    Editor    │
+│  (Godot C#)  │
+└──────────────┘
 ```
 
 ---
@@ -94,21 +101,20 @@ FrogCreator/
 
 | Technologie | Utilisation |
 |---|---|
-| **Java 8** | Langage principal |
-| **Maven** | Gestion de build et dépendances |
-| **LibGDX 1.9.6** | Framework de jeu (rendu, entrées, audio) |
-| **LWJGL** | Backend OpenGL pour le client desktop |
-| **JavaFX** | Interface de l'éditeur |
-| **JSON (org.json)** | Sérialisation des données |
-| **JUnit 4** | Tests unitaires |
+| **C# / .NET 8** | Langage principal |
+| **Godot 4.2** | Moteur de jeu (rendu, entrées, audio, éditeur) |
+| **Godot.NET.Sdk** | SDK pour l'intégration C# avec Godot |
+| **System.Text.Json** | Sérialisation des données |
+| **System.Net.Sockets** | Communication réseau TCP |
+| **NUnit 3** | Tests unitaires |
 | **RSA** | Chiffrement des communications réseau |
 
 ---
 
 ## 📋 Prérequis
 
-- **Java JDK 8** ou supérieur
-- **Apache Maven 3.x**
+- **Godot 4.2** (version avec support C# / .NET)
+- **.NET 8 SDK**
 - **Git**
 
 ---
@@ -118,59 +124,66 @@ FrogCreator/
 ```bash
 # Cloner le dépôt
 git clone https://github.com/ClementDidier/FrogCreator.git
-cd FrogCreator
+cd FrogCreator/godot
 
-# Compiler l'ensemble du projet
-mvn clean install
+# Restaurer les dépendances .NET
+dotnet restore
 
-# Compiler un module spécifique
-mvn clean install -pl api
-mvn clean install -pl client
-mvn clean install -pl server
-mvn clean install -pl editor
+# Compiler le projet
+dotnet build
+
+# Lancer via Godot
+# Ouvrir project.godot dans l'éditeur Godot 4.2 (C#)
 ```
 
 ### Lancer les tests
 
 ```bash
-mvn test
+cd godot
+dotnet test tests/FrogCreator.Tests.csproj
 ```
 
 ---
 
 ## 📦 Modules
 
-### API (`api/`)
+### API (`scripts/api/`)
 Bibliothèque centrale partagée entre le client et le serveur. Contient :
 - **Entités** : `Entity`, `Character`, `Player`, `NPC`, `Item`
 - **Carte** : `GameMap`, `GameMapChunk`, `GameMapLayer`
 - **Réseau** : `Packet`, `FrogClientSocket`, `FrogServerSocket`, gestion asynchrone des paquets
 - **Systèmes** : architecture ECS avec `GameSystem`, `HealthSystem`, composants et événements
 - **IA** : pathfinding A* (`AStarPathfinder`)
-- **Plugins** : interfaces `Plugin` et `FrogPlugin`
+- **Plugins** : interfaces `IPlugin` et attribut `FrogPlugin`
 - **Sécurité** : chiffrement RSA
 - **i18n** : support multilingue (FR, EN)
 
-### Client (`client/`)
-Client de jeu desktop utilisant LibGDX :
-- Écrans : menu principal, sélection de serveur, sélection de personnage, jeu principal
-- Effets visuels et transitions (fondu, tremblement)
-- Rendu graphique par batch
+### Client (`scripts/client/`)
+Client de jeu utilisant Godot 4 :
+- Écrans : splash, menu principal, sélection de serveur, sélection de personnage, jeu principal
+- Effets visuels et transitions (fondu entrant/sortant, tremblement de caméra)
+- Gestion de caméra 2D et batch de rendu
 
-### Server (`server/`)
+### Server (`scripts/server/`)
 Serveur multijoueur gérant :
 - Connexions simultanées via `ClientWorker` et `RequestManager`
 - Exécution concurrente des tâches (`RequestExecutor`, `FrogTask`)
 - Chargement dynamique de plugins (`PluginLoader`)
 
-### Editor (`editor/`)
-Éditeur de contenu basé sur JavaFX pour la création et la modification des ressources du jeu (cartes, PNJ, objets, etc.).
+### Editor (`scripts/editor/`)
+Éditeur de contenu tirant parti des outils intégrés de Godot pour la création et la modification des ressources du jeu (cartes, PNJ, objets, etc.).
+
+### Tests (`tests/`)
+Tests unitaires NUnit couvrant :
+- Système d'entités et composants
+- Gestion de carte et chunks
+- Sérialisation et routage de paquets réseau
 
 ---
 
 ## 🗺 Roadmap
 
-### ✅ v1.0 — Fondations (version actuelle)
+### ✅ v1.0 — Fondations (Java/LibGDX — version précédente)
 
 - [x] Architecture Maven multi-modules (API, Client, Server, Editor)
 - [x] Système d'entités à composants (ECS)
@@ -181,14 +194,21 @@ Serveur multijoueur gérant :
 - [x] Système d'événements de jeu
 - [x] Architecture de plugins
 - [x] Client LibGDX avec gestion des écrans et transitions
-- [x] Internationalisation (FR/EN)
-- [x] Serveur concurrent multi-clients
-- [x] Structure de base de l'éditeur JavaFX
-- [x] Intégration continue (Travis CI)
 
-### 🔜 v1.1 — Consolidation
+### ✅ v2.0 — Migration C# / Godot 4 (version actuelle)
 
-- [ ] Éditeur de cartes complet dans l'éditeur JavaFX
+- [x] Migration du langage Java vers C# (.NET 8)
+- [x] Migration du moteur LibGDX vers Godot 4 (C#)
+- [x] Migration de JavaFX vers l'éditeur intégré Godot
+- [x] Migration de Maven vers .NET SDK / Godot.NET.Sdk
+- [x] Migration de JUnit vers NUnit 3
+- [x] Migration de org.json vers System.Text.Json
+- [x] Migration des sockets Java vers System.Net.Sockets
+- [x] Conversion complète de l'API, du client, du serveur et de l'éditeur
+
+### 🔜 v2.1 — Consolidation
+
+- [ ] Éditeur de cartes complet via Godot TileMap
 - [ ] Éditeur de PNJ et de dialogues
 - [ ] Système d'inventaire et gestion des objets
 - [ ] Système de combat de base (tour par tour ou temps réel)
@@ -196,21 +216,19 @@ Serveur multijoueur gérant :
 - [ ] Authentification et gestion des comptes joueurs
 - [ ] Persistance des données (base de données ou fichiers)
 
-### 🔮 v1.2 — Enrichissement
+### 🔮 v2.2 — Enrichissement
 
 - [ ] Système de quêtes complet
 - [ ] Système de scripting pour les événements de jeu
-- [ ] Éditeur d'animations et de sprites
+- [ ] Éditeur d'animations et de sprites via Godot
 - [ ] Système de guildes / groupes
 - [ ] Commerce entre joueurs
 - [ ] Système de classes et d'arbres de compétences
 
-### 🚀 v2.0 — Vision à long terme
+### 🚀 v3.0 — Vision à long terme
 
-- [ ] Migration vers une version Java plus récente (11+)
-- [ ] Support du scripting Lua ou JavaScript pour les créateurs de jeux
+- [ ] Support mobile (Android/iOS via export Godot)
 - [ ] Interface web d'administration du serveur
-- [ ] Support mobile (Android/iOS via LibGDX)
 - [ ] Système de marketplace pour partager les ressources communautaires
 - [ ] Documentation complète et tutoriels pour les créateurs
 
