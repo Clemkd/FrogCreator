@@ -25,7 +25,7 @@ public class Console
     public void error(FrogException exception)
     {
         if (DEBUG)
-            System.Console.Error.WriteLine($"[{exception.StackTrace}][{DateTime.UtcNow}] {exception.StackTrace}");
+            System.Console.Error.WriteLine($"[{exception.GetType().Name}][{DateTime.UtcNow}] {exception.StackTrace}");
         if (LOGS_ENABLED)
             _logWriter?.WriteLine(exception.StackTrace);
     }

@@ -58,7 +58,7 @@ public class PluginLoader
                         }
                         catch (InvalidCastException)
                         {
-                            // Cas de cast d'une classe avec l'annotation @Plugin mais qui n'implémente pas Plugin
+                            // Cas de cast d'une classe avec l'attribut FrogPlugin mais qui n'implémente pas IPlugin
                             Console.Error.WriteLine($"Une classe annotée ne correspond pas au type de plugin attendu. ({type.FullName})");
                         }
                     }
