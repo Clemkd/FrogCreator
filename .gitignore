@@ -1,15 +1,28 @@
-*.class
+# =========================
+# Godot / .NET / C#
+# =========================
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# Godot-specific ignores
+.godot/
+*.import
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.dll
+*.exe
+*.pdb
+*.user
+*.suo
+*.cache
+*.log
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# NuGet
+*.nupkg
+.nuget/
+packages/
 
 # =========================
 # Operating System Files
@@ -61,10 +74,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-*.classpath
-*.project
-*.prefs
 
-*/.settings/*
-*/bin/*
-*/target/*
+# IDE
+*.vs/
+.idea/
+*.sln.DotSettings.user
